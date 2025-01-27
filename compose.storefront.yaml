@@ -1,0 +1,25 @@
+services:
+  frontend:
+    build: storefront
+    ports:
+      - 8000:8000
+    networks:
+      - medusa-network
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1024M
+    volumes:
+      - storefront-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  medusa-network:
+
+volumes:
+  storefront-data:

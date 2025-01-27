@@ -1,0 +1,7 @@
+services:
+  postgres:
+    deploy:
+      resources: !reset null
+  backend-server:
+    deploy:
+      resources: !reset null

@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: medusa-starter
+      POSTGRES_PASSWORD: medusa-password
+      POSTGRES_DB: medusa-starter
+    ports:
+      - 5432:5432
+    networks:
+      - medusa-network
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1024M
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "medusa-starter"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - 6379:6379
+    networks:
+      - medusa-network
+    volumes:
+      - cache-backend-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend-server:
+    build: backend
+    ports:
+      - 9000:9000
+    networks:
+      - medusa-network
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 2048M
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - backend-server-data:/data
+    environment:
+      STORE_CORS: http://localhost:8000
+      ADMIN_CORS: http://localhost:8000,http://localhost:9000
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  medusa-network:
+
+volumes:
+  postgres-data:
+  backend-server-data:
+  cache-backend-data:

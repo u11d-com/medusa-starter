@@ -1,0 +1,126 @@
+name: Build Docker Images
+on:
+  push:
+    branches:
+      - v1
+    tags:
+      - "v1*"
+
+concurrency:
+  group: ${{ github.ref }}/build-v1
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-22.04
+    if: github.event_name != 'pull_request'
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+      - name: Save backend files
+        run: mv backend backend_backup
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: medusajs/medusa-starter-default
+          ref: 46de582ea7af0f80718e745e89407c407634aa46
+          path: backend
+      - name: Restore backend files
+        run: mv backend_backup/* backend/ && rm -rf backend_backup
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/medusa-backend
+          labels: |
+            org.opencontainers.image.title="MedusaJS Backend"
+            org.opencontainers.image.description="Medusa JS Backend Starter image"
+            org.opencontainers.image.vendor=u11d.com
+          tags: |
+            type=sha,prefix=1.20.10-
+            type=raw,prefix=1.20.10-,value=latest
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: backend
+          file: ./backend/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  storefront:
+    runs-on: ubuntu-22.04
+    if: github.event_name != 'pull_request'
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Save storefront files
+        run: mv storefront storefront_backup
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: medusajs/nextjs-starter-medusa
+          ref: 0f5452dfe44838f890b798789d75db1a81303b7a
+          path: storefront
+      - name: Restore storefront files
+        run: mv storefront_backup/* storefront/ && rm -rf storefront_backup
+      - name: Save backend files
+        run: mv backend backend_backup
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: medusajs/medusa-starter-default
+          ref: 46de582ea7af0f80718e745e89407c407634aa46
+          path: backend
+      - name: Restore backend files
+        run: mv backend_backup/* backend/ && rm -rf backend_backup
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/medusa-storefront
+          labels: |
+            org.opencontainers.image.title="MedusaJS Storefront"
+            org.opencontainers.image.description="Medusa JS Storefront Starter image"
+            org.opencontainers.image.vendor=u11d.com
+          tags: |
+            type=sha,prefix=1.18.1-
+            type=raw,prefix=1.18.1-,value=latest
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Start backend
+        run: docker compose -f compose.yaml -f .github/compose.override.yaml up -d
+      - name: Seed backend with data
+        run: docker compose -f compose.seed.yaml run --rm seed
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: storefront
+          file: ./storefront/Dockerfile
+          add-hosts: |
+            host.docker.internal=host-gateway
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

@@ -1,0 +1,6 @@
+.cache
+build
+node_modules
+README.md
+Dockerfile
+.dockerignore
