@@ -42,8 +42,12 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/medusa-backend
           labels: |
-            org.opencontainers.image.title="MedusaJS Backend"
-            org.opencontainers.image.description="Medusa JS Backend Starter image"
+            org.opencontainers.image.title=MedusaJS Backend
+            org.opencontainers.image.description=Medusa JS Backend Starter image
+            org.opencontainers.image.vendor=u11d.com
+          annotations: |
+            org.opencontainers.image.title=MedusaJS Backend
+            org.opencontainers.image.description=Medusa JS Backend Starter image
             org.opencontainers.image.vendor=u11d.com
           tags: |
             type=sha,prefix=1.20.10-
@@ -63,6 +67,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
   storefront:
     runs-on: ubuntu-22.04
     if: github.event_name != 'pull_request'
@@ -98,8 +103,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/medusa-storefront
           labels: |
-            org.opencontainers.image.title="MedusaJS Storefront"
-            org.opencontainers.image.description="Medusa JS Storefront Starter image"
+            org.opencontainers.image.title=MedusaJS Storefront
+            org.opencontainers.image.description=Medusa JS Storefront Starter image
             org.opencontainers.image.vendor=u11d.com
           tags: |
             type=sha,prefix=1.18.1-
