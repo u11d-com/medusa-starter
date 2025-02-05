@@ -4,7 +4,7 @@ set -eu
 
 if [[ "${MEDUSA_RUN_MIGRATION:-true}" = "true" ]]; then
   npx medusa migrations run
-  echo "Migration has been done succesfully."
+  echo "Migration has been done successfully."
 fi
 
 if [[ "${MEDUSA_CREATE_ADMIN_USER:-false}" = "true" ]]; then
@@ -15,10 +15,10 @@ if [[ "${MEDUSA_CREATE_ADMIN_USER:-false}" = "true" ]]; then
     if [[ $CREATE_OUTPUT != *"A user with the same email already exists."* ]]; then
       exit $CREATE_EXIT_CODE
     else
-      echo "Admin user alreday exists."
+      echo "Admin user already exists."
     fi
   else
-    echo "Admin has been created succesfully."
+    echo "Admin has been created successfully."
   fi
 fi
 
