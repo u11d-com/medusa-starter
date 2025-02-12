@@ -4,13 +4,15 @@ FROM base AS builder
 WORKDIR /opt/storefront/build
 RUN env
 ARG MEDUSA_BACKEND_URL=http://host.docker.internal:9000
-ARG NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
 ENV MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
 ENV NEXT_PUBLIC_MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
 ENV NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 COPY . .
 RUN \
-  if [ -f yarn.lock ]; then corepack enable yarn && yarn install --immutable && yarn run build; \
+  if [ -f yarn.lock ]; then corepack enable yarn \
+    && yarn install \
+    && yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
   else echo "Lockfile not found." && exit 1; \
