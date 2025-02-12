@@ -1,6 +1,6 @@
 services:
   seed:
-    build: backend
+    build: my-medusa-store
     command: yarn seed
     restart: "no"
     ports:
@@ -9,7 +9,8 @@ services:
       - medusa-network
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter
+      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
+      POSTGRES_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
 
 networks:
   medusa-network:

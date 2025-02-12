@@ -1,0 +1,145 @@
+name: Build Docker Images
+on: push
+  # push:
+  #   branches:
+  #     - v2
+  #   tags:
+  #     - "v2*"
+
+concurrency:
+  group: ${{ github.ref }}/build-v2
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-22.04
+    if: github.event_name != 'pull_request'
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+      - name: Save backend files
+        run: mv backend backend_backup
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: medusajs/medusa-starter-default
+          ref: master
+          path: backend
+      - name: Restore backend files
+        run: mv backend_backup/* backend/ && rm -rf backend_backup
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/medusajs-backend
+          labels: |
+            org.opencontainers.image.title=MedusaJS Backend
+            org.opencontainers.image.description=Medusa JS Backend Starter image
+            org.opencontainers.image.vendor=u11d.com
+          annotations: |
+            org.opencontainers.image.title=MedusaJS Backend
+            org.opencontainers.image.description=Medusa JS Backend Starter image
+            org.opencontainers.image.vendor=u11d.com
+          tags: |
+            type=sha,prefix=2-
+            type=semver,pattern={{version}}-{{sha}}
+            type=semver,pattern={{version}},suffix=-latest
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: backend
+          file: ./backend/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+  storefront:
+    runs-on: ubuntu-22.04
+    if: github.event_name != 'pull_request'
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+      - name: Save storefront files
+        run: mv storefront storefront_backup
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: medusajs/nextjs-starter-medusa
+          ref: master
+          path: storefront
+      - name: Restore storefront files
+        run: mv storefront_backup/* storefront/ && rm -rf storefront_backup
+      - name: Save backend files
+        run: mv backend backend_backup
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: medusajs/medusa-starter-default
+          ref: master
+          path: backend
+      - name: Restore backend files
+        run: mv backend_backup/* backend/ && rm -rf backend_backup
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/medusajs-storefront
+          labels: |
+            org.opencontainers.image.title="MedusaJS Storefront"
+            org.opencontainers.image.description="Medusa JS Storefront Starter image"
+            org.opencontainers.image.vendor=u11d.com
+          annotations: |
+            org.opencontainers.image.title=MedusaJS Backend
+            org.opencontainers.image.description=Medusa JS Backend Starter image
+            org.opencontainers.image.vendor=u11d.com
+          tags: |
+            type=sha,prefix=2-
+            type=semver,pattern={{version}}-{{sha}}
+            type=semver,pattern={{version}},suffix=-latest
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Start backend
+        run: docker compose -f compose.yaml -f .github/compose.override.yaml up -d
+      - name: Seed backend with data
+        run: docker compose -f compose.seed.yaml run --rm seed
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: storefront
+          file: ./storefront/Dockerfile
+          add-hosts: |
+            host.docker.internal=host-gateway
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}

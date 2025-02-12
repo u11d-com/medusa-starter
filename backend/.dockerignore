@@ -1,6 +1,12 @@
 .cache
+.dockerignore
+.github
+.vscode
+.idea
+.gitignore
+.medusa
 build
 node_modules
 README.md
 Dockerfile
-.dockerignore
+integration-tests

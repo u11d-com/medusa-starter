@@ -1,6 +1,9 @@
 services:
   frontend:
-    build: storefront
+    build:
+      context: my-medusa-store-storefront
+      args:
+        - NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
     ports:
       - 8000:8000
     networks:

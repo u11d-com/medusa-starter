@@ -37,7 +37,7 @@ services:
       retries: 5
 
   backend-server:
-    build: backend
+    build: my-medusa-store
     ports:
       - 9000:9000
     networks:
@@ -45,7 +45,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "4"
+          cpus: "2"
           memory: 2048M
     depends_on:
       postgres:
@@ -55,10 +55,15 @@ services:
     volumes:
       - backend-server-data:/data
     environment:
+      NODE_ENV: CI
       STORE_CORS: http://localhost:8000
       ADMIN_CORS: http://localhost:8000,http://localhost:9000
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter
+      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
+      POSTGRES_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
+      MEDUSA_CREATE_ADMIN_USER: true
+      MEDUSA_ADMIN_EMAIL: test@medusa.com
+      MEDUSA_ADMIN_PASSWORD: password
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
       interval: 30s
