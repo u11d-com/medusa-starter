@@ -1,6 +1,6 @@
 services:
   seed:
-    build: my-medusa-store
+    build: backend
     command: yarn seed
     restart: "no"
     ports:
