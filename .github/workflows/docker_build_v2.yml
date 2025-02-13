@@ -151,7 +151,7 @@ jobs:
           file: ./storefront/Dockerfile
           add-hosts: |
             host.docker.internal=host-gateway
-          build_args: |
+          build-args: |
             PUBLISHABLE_KEY=${{ steps.get_publishable_key.outputs.PUBLISHABLE_KEY }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}

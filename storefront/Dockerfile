@@ -1,15 +1,10 @@
 ARG NODE_VERSION=23.7
 FROM node:${NODE_VERSION}-bookworm-slim AS base
 
-FROM base AS builder
-WORKDIR /opt/storefront/build
-ARG MEDUSA_BACKEND_URL=http://host.docker.internal:9000
-ARG NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
-ENV MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
-ENV NEXT_PUBLIC_MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
-ENV NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+FROM base AS deps
+WORKDIR /opt/storefront/deps
 
-COPY package*.json yarn.lock* pnpm-lock.yaml* ./
+COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
 # Install dependencies
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn install; \
@@ -18,12 +13,21 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+FROM base AS builder
+WORKDIR /opt/storefront/build
+ARG MEDUSA_BACKEND_URL=http://host.docker.internal:9000
+ARG NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
+ENV MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
+ENV NEXT_PUBLIC_MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
+ENV NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
 # Build the application
+COPY --from=deps /opt/storefront/deps .
 COPY . .
 RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
+  if [ -f yarn.lock ]; then corepack enable yarn && yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
   fi
 
 FROM base AS runner
