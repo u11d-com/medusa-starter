@@ -137,9 +137,16 @@ jobs:
           # Get the API key token
           export PUBLISHABLE_KEY=$(curl "${BACKEND_URL}/admin/api-keys" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" | jq -r '.api_keys[0].token')
-
+          echo "$BACKEND_URL $ACCESS_TOKEN $PUBLISHABLE_KEY"
           # Export the key to GitHub outputs
           echo "PUBLISHABLE_KEY=${PUBLISHABLE_KEY}" >> $GITHUB_OUTPUT
+
+          curl -X POST "${BACKEND_URL}/auth/user/emailpass" \
+            -H 'Content-Type: application/json' \
+            --data-raw '{
+              "email": "admin@medusa-test.com",
+              "password": "supersecret"
+            }' | jq -r '.token'
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
