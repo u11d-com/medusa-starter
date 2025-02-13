@@ -65,7 +65,7 @@ services:
       MEDUSA_ADMIN_EMAIL: admin@medusa-test.com
       MEDUSA_ADMIN_PASSWORD: supersecret
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
