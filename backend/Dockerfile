@@ -7,7 +7,7 @@ WORKDIR /opt/medusa/deps
 COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
 # Install dependencies
 RUN \
-  if [ -f yarn.lock ]; then corepack enable yarn && yarn install; \
+  if [ -f yarn.lock ]; then corepack enable yarn && yarn install --immutable; \
   elif [ -f package-lock.json ]; then npm ci; \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install; \
   else echo "Lockfile not found." && exit 1; \
