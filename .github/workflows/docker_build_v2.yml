@@ -125,7 +125,8 @@ jobs:
         id: key
         run: |
           export BACKEND_URL="http://localhost:9000"
-          which jq
+          curl -v "${BACKEND_URL}/health"
+          curl -f "${BACKEND_URL}/health"
 
           # Login and get access token
           export ACCESS_TOKEN=$(curl -v -X POST "${BACKEND_URL}/auth/user/emailpass" \
