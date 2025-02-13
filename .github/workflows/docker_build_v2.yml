@@ -118,7 +118,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Start backend
-        run: docker compose -f compose.yaml -f .github/compose.override.yaml up -d
+        run: docker compose -f compose.yaml -f .github/compose.override.yaml up --build -d
       - name: Seed backend with data
         run: docker compose -f compose.seed.yaml run --rm seed
       - name: Get publishable token
