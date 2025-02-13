@@ -1,27 +1,36 @@
-FROM node:23.7-bookworm-slim AS base
+ARG NODE_VERSION=23.7
+FROM node:${NODE_VERSION}-bookworm-slim AS base
 
 FROM base AS builder
 WORKDIR /opt/storefront/build
-RUN env
 ARG MEDUSA_BACKEND_URL=http://host.docker.internal:9000
 ARG NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
 ENV MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
 ENV NEXT_PUBLIC_MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
 ENV NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
+COPY package*.json yarn.lock* pnpm-lock.yaml* ./
+# Install dependencies
+RUN \
+  if [ -f yarn.lock ]; then corepack enable yarn && yarn install; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Build the application
 COPY . .
 RUN \
-  if [ -f yarn.lock ]; then corepack enable yarn \
-    && yarn install \
-    && yarn run build; \
+  if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
   fi
 
 FROM base AS runner
 RUN apt-get update \
   && apt-get install --no-install-recommends -y tini=0.19.0-1 \
-  && rm -rf /var/lib/apt/lists/*
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER node
 WORKDIR /opt/storefront
 COPY --from=builder --chown=node:node /opt/storefront/build/ .

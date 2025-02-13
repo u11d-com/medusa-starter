@@ -10,19 +10,19 @@
 # Environment Variables:
 #   MEDUSA_RUN_MIGRATION     Set to "true" to run database migrations (default: true)
 #   MEDUSA_CREATE_ADMIN_USER Set to "true" to create admin user (default: false)
-#   MEDUSA_ADMIN_EMAIL      Admin user email (required if MEDUSA_CREATE_ADMIN_USER=true)
-#   MEDUSA_ADMIN_PASSWORD   Admin user password (required if MEDUSA_CREATE_ADMIN_USER=true)
+#   MEDUSA_ADMIN_EMAIL       Admin user email (required if MEDUSA_CREATE_ADMIN_USER=true)
+#   MEDUSA_ADMIN_PASSWORD    Admin user password (required if MEDUSA_CREATE_ADMIN_USER=true)
 #
 # Examples:
 #   ./start.sh                               # Start with default settings
 #   ./start.sh --build-folder=./custom-path  # Start with custom build folder
 #   MEDUSA_CREATE_ADMIN_USER=true \
-#   MEDUSA_ADMIN_EMAIL=admin@example.com \
-#   MEDUSA_ADMIN_PASSWORD=secret ./start.sh  # Start and create admin user
+#   MEDUSA_ADMIN_EMAIL=admin@medusa-test.com \
+#   MEDUSA_ADMIN_PASSWORD=supersecret ./start.sh  # Start and create admin user
 
 set -eu
 
-# Default seed file path
+# Default build directory path
 BUILD_FOLDER=".medusa/server"
 
 # Parse command line arguments

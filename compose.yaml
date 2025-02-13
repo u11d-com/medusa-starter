@@ -62,8 +62,8 @@ services:
       DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
       POSTGRES_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
       MEDUSA_CREATE_ADMIN_USER: true
-      MEDUSA_ADMIN_EMAIL: test@medusa.com
-      MEDUSA_ADMIN_PASSWORD: password
+      MEDUSA_ADMIN_EMAIL: admin@medusa-test.com
+      MEDUSA_ADMIN_PASSWORD: supersecret
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
       interval: 30s
