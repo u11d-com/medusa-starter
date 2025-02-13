@@ -122,12 +122,12 @@ jobs:
       - name: Seed backend with data
         run: docker compose -f compose.seed.yaml run --rm seed
       - name: Get publishable token
-        id: get_publishable_key
+        id: key
         run: |
           export BACKEND_URL="http://localhost:9000"
 
           # Login and get access token
-          ACCESS_TOKEN=$(curl -X POST "${BACKEND_URL}/auth/user/emailpass" \
+          export ACCESS_TOKEN=$(curl -X POST "${BACKEND_URL}/auth/user/emailpass" \
             -H 'Content-Type: application/json' \
             --data-raw '{
               "email": "admin@medusa-test.com",
@@ -135,14 +135,11 @@ jobs:
             }' | jq -r '.token')
 
           # Get the API key token
-          PUBLISHABLE_KEY=$(curl "${BACKEND_URL}/admin/api-keys" \
+          export PUBLISHABLE_KEY=$(curl "${BACKEND_URL}/admin/api-keys" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" | jq -r '.api_keys[0].token')
 
           # Export the key to GitHub outputs
           echo "PUBLISHABLE_KEY=${PUBLISHABLE_KEY}" >> $GITHUB_OUTPUT
-      - name: test
-        run: |
-          echo ${{ steps.get_publishable_key.outputs }}
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -151,7 +148,7 @@ jobs:
           add-hosts: |
             host.docker.internal=host-gateway
           build-args: |
-            PUBLISHABLE_KEY=${{ steps.get_publishable_key.outputs.PUBLISHABLE_KEY }}
+            PUBLISHABLE_KEY=${{ steps.key.outputs.PUBLISHABLE_KEY }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
