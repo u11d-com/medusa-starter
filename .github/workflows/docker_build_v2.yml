@@ -119,7 +119,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Start backend
         run: |
-          docker compose -f compose.yaml -f .github/compose.override.yaml up --build && while docker ps --format "{{.ID}} {{.Status}}" | grep -q 'health: starting'; do sleep 5; done
+          docker compose -f compose.yaml -f .github/compose.override.yaml up --build -d && while docker ps --format "{{.ID}} {{.Status}}" | grep -q 'health: starting'; do sleep 5; done
       - name: Seed backend with data
         run: docker compose -f compose.seed.yaml run --rm seed
       - name: Get publishable token
