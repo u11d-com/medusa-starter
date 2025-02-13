@@ -66,8 +66,9 @@ services:
       MEDUSA_ADMIN_PASSWORD: supersecret
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
+      start_period: 5s
       retries: 3
 
 networks:

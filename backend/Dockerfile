@@ -39,5 +39,9 @@ ARG NODE_ENV=production
 ENV PORT=$PORT
 ENV NODE_ENV=$NODE_ENV
 EXPOSE $PORT
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["./start.sh"]
