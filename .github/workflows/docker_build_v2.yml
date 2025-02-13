@@ -140,9 +140,9 @@ jobs:
 
           # Export the key to GitHub outputs
           echo "PUBLISHABLE_KEY=${PUBLISHABLE_KEY}" >> $GITHUB_OUTPUT
-      - name:
+      - name: test
         run: |
-          echo ${{ steps.get_publishable_key.outputs.PUBLISHABLE_KEY }}
+          echo ${{ steps.get_publishable_key.outputs }}
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
