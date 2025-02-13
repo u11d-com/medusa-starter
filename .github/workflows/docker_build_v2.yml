@@ -118,29 +118,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Start backend
-        run: docker compose -f compose.yaml -f .github/compose.override.yaml up
+        run: docker compose -f compose.yaml -f .github/compose.override.yaml up -d
       - name: Seed backend with data
         run: docker compose -f compose.seed.yaml run --rm seed
       - name: Get publishable token
         id: get_publishable_key
         run: |
-          BACKEND_URL="http://localhost:9000"
+          export BACKEND_URL="http://localhost:9000"
 
           # Login and get access token
-          ACCESS_TOKEN=$(curl -X POST "${BACKEND_URL}/store/auth" \
+          ACCESS_TOKEN=$(curl -X POST "${BACKEND_URL}/auth/user/emailpass" \
             -H 'Content-Type: application/json' \
             --data-raw '{
               "email": "admin@medusa-test.com",
               "password": "supersecret"
-            }' | jq -r '.access_token')
+            }' | jq -r '.token')
 
-          # Get API keys and extract the first key ID
-          KEY_ID=$(curl "${BACKEND_URL}/admin/api-keys" \
-            -H "Authorization: Bearer ${ACCESS_TOKEN}" | jq -r '.api_keys[0].id')
-
-          # Get the specific API key details
-          PUBLISHABLE_KEY=$(curl "${BACKEND_URL}/admin/api-keys/${KEY_ID}" \
-            -H "Authorization: Bearer ${ACCESS_TOKEN}" | jq -r '.api_key.token')
+          # Get the API key token
+          PUBLISHABLE_KEY=$(curl "${BACKEND_URL}/admin/api-keys" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" | jq -r '.api_keys[0].token')
 
           # Export the key to GitHub outputs
           echo "PUBLISHABLE_KEY=${PUBLISHABLE_KEY}" >> $GITHUB_OUTPUT
