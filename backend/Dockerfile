@@ -18,6 +18,7 @@ WORKDIR /opt/medusa/build
 
 COPY --from=deps /opt/medusa/deps .
 COPY . .
+ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=true
 # Build the application
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn run build; \
