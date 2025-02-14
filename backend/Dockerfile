@@ -5,6 +5,7 @@ FROM base AS deps
 WORKDIR /opt/medusa/deps
 
 COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
+ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=".net"
 # Install dependencies
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn install --immutable; \
@@ -18,7 +19,7 @@ WORKDIR /opt/medusa/build
 
 COPY --from=deps /opt/medusa/deps .
 COPY . .
-ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=true
+ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=".net"
 # Build the application
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn run build; \
@@ -39,6 +40,7 @@ ARG PORT=9000
 ARG NODE_ENV=production
 ENV PORT=$PORT
 ENV NODE_ENV=$NODE_ENV
+ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=".net"
 EXPOSE $PORT
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
