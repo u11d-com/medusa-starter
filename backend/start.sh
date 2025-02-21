@@ -23,7 +23,7 @@
 set -eu
 
 # Default build directory path
-BUILD_FOLDER=".medusa/server"
+BUILD_FOLDER="."
 
 # Parse command line arguments
 while [ $# -gt 0 ]; do

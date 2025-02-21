@@ -5,7 +5,6 @@ FROM base AS deps
 WORKDIR /opt/medusa/deps
 
 COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
-ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=".net"
 # Install dependencies
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn install --immutable; \
@@ -19,7 +18,6 @@ WORKDIR /opt/medusa/build
 
 COPY --from=deps /opt/medusa/deps .
 COPY . .
-ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=".net"
 # Build the application
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn run build; \
@@ -34,13 +32,13 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER node
 WORKDIR /opt/medusa
-COPY --from=builder --chown=node:node /opt/medusa/build .
-COPY --from=builder --chown=node:node /opt/medusa/build/node_modules ./.medusa/server/node_modules
+COPY --from=builder --chown=node:node /opt/medusa/build/.medusa/server .
+COPY --from=builder --chown=node:node /opt/medusa/build/node_modules ./node_modules
+COPY --from=builder --chown=node:node /opt/medusa/build/start.sh ./start.sh
 ARG PORT=9000
 ARG NODE_ENV=production
 ENV PORT=$PORT
 ENV NODE_ENV=$NODE_ENV
-ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=".net"
 EXPOSE $PORT
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \

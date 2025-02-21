@@ -34,8 +34,8 @@ jobs:
           repository: medusajs/medusa-starter-default
           ref: master
           path: backend
-      - name: Restore backend files
-        run: mv backend_backup/* backend/ && rm -rf backend_backup
+      - name: Restore backend files, use override for medusa-config.ts
+        run: mv -f backend_backup/* backend/ && mv -f q.github/medusa-config.ovveride.ts backend/medusa-config.ts && rm -rf backend_backup
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5

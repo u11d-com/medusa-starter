@@ -59,6 +59,9 @@ services:
       STORE_CORS: http://localhost:8000
       ADMIN_CORS: http://localhost:8000,http://localhost:9000
       REDIS_URL: redis://redis:6379
+      CACHE_REDIS_URL: redis://redis:6379
+      EVENTS_REDIS_URL: redis://redis:6379
+      WE_REDIS_URL: redis://redis:6379
       DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
       POSTGRES_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
       MEDUSA_CREATE_ADMIN_USER: true
