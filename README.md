@@ -1,3 +1,5 @@
+![v2 Build](https://github.com/{owner}/{repo}/actions/workflows/docker_build_v2.yml/badge.svg) ![v1 Build](https://github.com/{owner}/{repo}/actions/workflows/docker_build_v1.yml/badge.svg)
+
 # Project Starter Templates for MedusaJS
 
 ## Introduction

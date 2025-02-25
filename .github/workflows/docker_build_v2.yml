@@ -20,6 +20,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -35,7 +42,7 @@ jobs:
           ref: master
           path: backend
       - name: Restore backend files, use override for medusa-config.ts
-        run: mv -f backend_backup/* backend/ && mv -f .github/medusa-config.override.ts backend/medusa-config.ts && rm -rf backend_backup
+        run: mv -f backend_backup/* backend/ && mv -f .github/medusa-config.override.ts backend/medusa-config.ts && rm -rf backend_backup && ls -la backend
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -63,7 +70,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: backend
-          file: ./backend/Dockerfile
+          # file: ./backend/Dockerfile
           platforms: linux/amd64,linux/arm64
           build-args: |
             NODE_ENV=development
@@ -80,6 +87,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
       - name: Save storefront files
         run: mv storefront storefront_backup
       - name: Checkout
@@ -150,7 +164,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: storefront
-          file: ./storefront/Dockerfile
+          # file: ./storefront/Dockerfile
           add-hosts: |
             host.docker.internal=host-gateway
           build-args: |

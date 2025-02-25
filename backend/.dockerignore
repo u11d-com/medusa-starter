@@ -5,6 +5,7 @@
 .idea
 .gitignore
 .medusa
+.git
 build
 node_modules
 README.md
