@@ -75,7 +75,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: backend
-          # file: ./backend/Dockerfile
           platforms: linux/amd64,linux/arm64
           build-args: |
             NODE_ENV=development
@@ -169,12 +168,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: storefront
-          # file: ./storefront/Dockerfile
           add-hosts: |
             host.docker.internal=host-gateway
           build-args: |
             NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${{ steps.key.outputs.PUBLISHABLE_KEY }}
-            NODE_ENV=development
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
