@@ -12,7 +12,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
+          cpus: 2
           memory: 1024M
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -45,7 +45,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
+          cpus: 2
           memory: 2048M
     depends_on:
       postgres:
@@ -71,8 +71,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 10s
       timeout: 5s
-      start_period: 5s
-      retries: 3
+      start_period: 10s
+      retries: 5
 
 networks:
   medusa-network:

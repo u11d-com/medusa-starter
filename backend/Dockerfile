@@ -3,9 +3,11 @@ FROM node:${NODE_VERSION}-bookworm-slim AS base
 
 FROM base AS deps
 WORKDIR /opt/medusa/deps
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
 
-COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
 # Install dependencies
+COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn install --immutable; \
   elif [ -f package-lock.json ]; then npm ci; \
@@ -15,10 +17,12 @@ RUN \
 
 FROM base AS builder
 WORKDIR /opt/medusa/build
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
 
+# Build the application
 COPY --from=deps /opt/medusa/deps .
 COPY . .
-# Build the application
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
@@ -30,19 +34,16 @@ RUN apt-get update \
   && apt-get install --no-install-recommends -y tini=0.19.0-1 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 USER node
 WORKDIR /opt/medusa
-COPY --from=builder --chown=node:node /opt/medusa/build/.medusa/server .
-COPY --from=builder --chown=node:node /opt/medusa/build/node_modules ./node_modules
-COPY --from=builder --chown=node:node /opt/medusa/build/start.sh ./start.sh
+COPY --from=builder --chown=node:node /opt/medusa/build .
 ARG PORT=9000
 ARG NODE_ENV=production
 ENV PORT=$PORT
 ENV NODE_ENV=$NODE_ENV
-EXPOSE $PORT
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+EXPOSE $PORT
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["./start.sh"]

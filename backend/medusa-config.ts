@@ -35,7 +35,7 @@ module.exports = defineConfig({
         },
       },
     },
-    // Uncomment this block when deploying to production
+    // Uncomment to use an AWS S3-compatible service for file storage in production
     // {
     //   resolve: "@medusajs/medusa/file",
     //   options: {

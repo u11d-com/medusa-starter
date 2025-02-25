@@ -65,6 +65,8 @@ jobs:
           context: backend
           file: ./backend/Dockerfile
           platforms: linux/amd64,linux/arm64
+          build-args: |
+            NODE_ENV=development
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -119,7 +121,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Start backend
         run: |
-          docker compose -f compose.yaml -f .github/compose.override.yaml up --build -d && while docker ps --format "{{.ID}} {{.Status}}" | grep -q 'health: starting'; do sleep 5; done
+          docker compose -f compose.yaml -f .github/compose.override.yaml up --build -d
+      - name: Wait for backend to start
+        run: |
+          while docker ps --format "{{.ID}} {{.Status}}" | grep -q 'health: starting'; do sleep 5; done
       - name: Seed backend with data
         run: docker compose -f compose.seed.yaml run --rm seed
       - name: Get publishable token
@@ -150,6 +155,7 @@ jobs:
             host.docker.internal=host-gateway
           build-args: |
             NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${{ steps.key.outputs.PUBLISHABLE_KEY }}
+            NODE_ENV=development
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
