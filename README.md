@@ -1,9 +1,9 @@
 ![v2 Build Status](https://img.shields.io/github/actions/workflow/status/u11d-com/medusa-starter/docker_build_v2.yml?branch=v2&label=Medusa%20v2%20build) ![v1 Build Status](https://img.shields.io/github/actions/workflow/status/u11d-com/medusa-starter/docker_build_v2.yml?branch=v1&label=Medusa%20v1%20build)
 
-# Project Starter Templates for Medusa
+# Project Starter Templates for Medusa Commerce Platform
 
 ## Introduction
-This project provides developers with starter templates for both the backend and storefront using the **Medusa framework** (v1). The primary objectives are to demonstrate:
+This project provides developers with starter templates for both the backend and storefront using the **Medusa framework**. The primary objectives are to demonstrate:
 
 - How to configure a development environment using **Docker Compose**.
 - How to structure a **GitHub workflow pipeline** for building and deploying a Medusa project.
