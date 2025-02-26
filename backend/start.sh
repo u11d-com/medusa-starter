@@ -27,7 +27,7 @@ EOF
     exit 0
 }
 
-set -eux
+set -eu
 
 # Default build directory path
 BUILD_FOLDER=".medusa/server"
