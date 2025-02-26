@@ -1,6 +1,13 @@
 .cache
+.dockerignore
+.gitignore
+.github
+.vscode
+.idea
+.medusa
+.yarn
+.next
 build
 node_modules
 README.md
 Dockerfile
-.dockerignore

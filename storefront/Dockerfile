@@ -1,44 +1,62 @@
-FROM node:20.18-bookworm-slim AS base
+ARG NODE_VERSION=23.7
+FROM node:${NODE_VERSION}-bookworm-slim AS base
 
-FROM base AS dependency-installer
+FROM base AS deps
 WORKDIR /opt/storefront/deps
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
+
+# Install dependencies
+COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
 RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  if [ -f yarn.lock ]; then corepack enable yarn && yarn install; \
   elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
 FROM base AS builder
 WORKDIR /opt/storefront/build
 ARG MEDUSA_BACKEND_URL=http://host.docker.internal:9000
+ARG NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
 ENV MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
 ENV NEXT_PUBLIC_MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
-COPY --from=dependency-installer /opt/storefront/deps/node_modules ./node_modules
+ENV NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
+# Build the application
+COPY --from=deps /opt/storefront/deps .
 COPY . .
+COPY --from=deps /opt/storefront/deps/yarn.lock ./yarn.lock
 RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
+  if [ -f yarn.lock ]; then corepack enable yarn && yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
   fi
 
 FROM base AS runner
 RUN apt-get update \
   && apt-get install --no-install-recommends -y tini=0.19.0-1 \
-  && rm -rf /var/lib/apt/lists/*
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 USER node
 WORKDIR /opt/storefront
 COPY --from=builder --chown=node:node /opt/storefront/build/ .
+
 ARG NODE_ENV=production
-ENV NODE_ENV=$NODE_ENV
 ARG PORT=8000
-ENV PORT=$PORT
-EXPOSE $PORT
 ARG MEDUSA_BACKEND_URL=http://host.docker.internal:9000
+ARG NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
+ENV PORT=$PORT
+ENV NODE_ENV=$NODE_ENV
 ENV MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
 ENV NEXT_PUBLIC_MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}
-ENV HOSTNAME=0.0.0.0
+ENV NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
+EXPOSE $PORT
+
+
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["npm", "start"]

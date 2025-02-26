@@ -9,7 +9,11 @@ services:
       - medusa-network
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter
+      CACHE_REDIS_URL: redis://redis:6379
+      EVENTS_REDIS_URL: redis://redis:6379
+      WE_REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
+      POSTGRES_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
 
 networks:
   medusa-network:

@@ -12,7 +12,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
+          cpus: 2
           memory: 1024M
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -45,7 +45,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "4"
+          cpus: 2
           memory: 2048M
     depends_on:
       postgres:
@@ -55,15 +55,24 @@ services:
     volumes:
       - backend-server-data:/data
     environment:
+      NODE_ENV: CI
       STORE_CORS: http://localhost:8000
       ADMIN_CORS: http://localhost:8000,http://localhost:9000
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter
+      CACHE_REDIS_URL: redis://redis:6379
+      EVENTS_REDIS_URL: redis://redis:6379
+      WE_REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
+      POSTGRES_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
+      MEDUSA_CREATE_ADMIN_USER: true
+      MEDUSA_ADMIN_EMAIL: admin@medusa-test.com
+      MEDUSA_ADMIN_PASSWORD: supersecret
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
 
 networks:
   medusa-network:
