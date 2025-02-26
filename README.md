@@ -156,6 +156,14 @@ docker compose -f compose.seed.yaml run --rm seed
 ```
 
 ### 3. Start the Storefront
+You need NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY value from Medusa backend admin panel.
+Log in to `localhost:9000/app` with credentials from `compose.yaml` file:
+
+  ```plaintext
+  MEDUSA_ADMIN_EMAIL: admin@medusa-test.com
+  MEDUSA_ADMIN_PASSWORD: supersecret
+  ```
+You can find publishable key value in dashboard settings. Change it's value in `compose.storefront.yaml` file and run command:
 
 ```bash
 docker compose -f compose.storefront.yaml up --build

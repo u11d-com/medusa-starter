@@ -57,7 +57,7 @@ done
 # Run database migration
 if [[ "${MEDUSA_RUN_MIGRATION:-true}" = "true" ]]; then
   npx medusa db:migrate
-  echo "Migration has been done succesfully."
+  echo "Migration has been done successfully."
 fi
 
 # Create admin user
