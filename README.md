@@ -17,6 +17,50 @@ This project provides developers with starter templates for both the backend and
 
 All modules are open-source and available on npm, providing full customization and extensibility.
 
+
+## Project Structure Overview
+The `medusa-starter` repository is organized to provide a clear, modular structure for managing both the backend and storefront of a Medusa-based commerce platform. The setup leverages Docker Compose for service orchestration and includes essential configuration files for streamlined development, testing, and deployment.
+
+### Directory Layout
+```bash
+medusa-starter/
+├── .github/                 # GitHub workflows and automation scripts
+├── .vscode/                 # VS Code workspace settings
+├── backend/                 # Medusa backend services
+│   ├── .dockerignore        # Defines files to exclude from Docker builds
+│   ├── Dockerfile           # Instructions to build the backend Docker image
+│   └── start.sh             # Script to handle migrations, admin user creation, and start backend
+├── storefront/              # Next.js storefront application
+│   ├── .dockerignore        # Defines files to exclude from Docker builds
+│   └── Dockerfile           # Instructions to build the storefront Docker image
+├── .editorconfig            # Maintains consistent coding styles
+├── compose.seed.yaml        # Docker Compose file for database seeding
+├── compose.storefront.yaml  # Docker Compose file for storefront services
+├── compose.yaml             # Main Docker Compose file orchestrating all services
+├── LICENSE                  # License information
+└── README.md                # Project documentation
+```
+
+### Key Components
+- `.github/` - Contains GitHub Actions workflows to automate CI/CD processes, ensuring smooth integration and deployment pipelines.
+- `.vscode/` - Houses workspace settings to standardize development environments across teams using Visual Studio Code.
+- `backend/` - This directory includes the Medusa backend setup:
+  - `.dockerignore`: Lists files and directories to ignore during Docker builds.
+  - `Dockerfile`: Defines the build instructions for the backend container.
+  - `start.sh`: A shell script to automate database migrations, create an admin user if necessary, and start the Medusa backend in cluster mode.
+- `storefront/` - The Next.js storefront application:
+  - `.dockerignore`: Specifies files to exclude from the Docker image build.
+  - `Dockerfile`: Instructions for building the storefront Docker image.
+- Docker Compose Files:
+  - `compose.yaml`: The primary file orchestrating PostgreSQL, Redis, and the Medusa backend services.
+  - `compose.storefront.yaml`: Manages the storefront container separately to ensure modular service management.
+  - `compose.seed.yaml`: Handles database seeding tasks.
+  - `compose.db.yaml`: Can be used to deploy database separately.
+- Other Configurations:
+  - `.editorconfig`: Ensures consistent code formatting across different editors and IDEs.
+  - `LICENSE`: Provides licensing information for the repository.
+  - `README.md`: Offers comprehensive project documentation.
+
 ## Installation & Setup
 
 ### Prerequisites
@@ -62,7 +106,6 @@ Follow the [Medusa installation guide](https://docs.medusajs.com/learn/installat
 
 ### 3. Add Containerization
 Use the Docker setup provided in this repository to containerize your project. Copy files from the `backend` and `storefront` directories to their respective locations in your project. Then, use these files to build Docker images for your application.
-
 
 ## Setup Using Git
 
