@@ -73,10 +73,10 @@ if [[ "${MEDUSA_CREATE_ADMIN_USER:-false}" = "true" ]]; then
     if [[ $CREATE_OUTPUT != *"User"*"already exists"* ]]; then
       exit $CREATE_EXIT_CODE
     else
-      echo "Admin user alreday exists."
+      echo "Admin user already exists."
     fi
   else
-    echo "Admin has been created succesfully."
+    echo "Admin has been created successfully."
   fi
 fi
 
