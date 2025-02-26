@@ -55,13 +55,13 @@ while [ $# -gt 0 ]; do
 done
 
 # Run database migration
-if [[ "${MEDUSA_RUN_MIGRATION:-true}" = "true" ]]; then
+if [[ "${MEDUSA_RUN_MIGRATION:-true}" == "true" ]]; then
   npx medusa db:migrate
   echo "Migration has been done successfully."
 fi
 
 # Create admin user
-if [[ "${MEDUSA_CREATE_ADMIN_USER:-false}" = "true" ]]; then
+if [[ "${MEDUSA_CREATE_ADMIN_USER:-false}" == "true" ]]; then
   if [[ -z "${MEDUSA_ADMIN_EMAIL:-}" ]] || [[ -z "${MEDUSA_ADMIN_PASSWORD:-}" ]]; then
     echo "Error: MEDUSA_ADMIN_EMAIL and MEDUSA_ADMIN_PASSWORD are required when MEDUSA_CREATE_ADMIN_USER is true" >&2
     exit 1

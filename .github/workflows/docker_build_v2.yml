@@ -47,7 +47,6 @@ jobs:
           mv -f backend_backup/* backend/
           mv -f .github/medusa-config.override.ts backend/medusa-config.ts
           rm -rf backend_backup
-          ls -la backend
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -107,7 +106,10 @@ jobs:
           ref: main
           path: storefront
       - name: Restore storefront files
-        run: mv storefront_backup/* storefront/ && rm -rf storefront_backup
+        run: |
+          shopt -s dotglob  # Enable dotfile globbing
+          mv -f storefront_backup/* storefront/
+          rm -rf storefront_backup
       - name: Save backend files
         run: mv backend backend_backup
       - name: Checkout
@@ -117,7 +119,7 @@ jobs:
           ref: master
           path: backend
       - name: Restore backend files
-        run: mv backend_backup/* backend/ && rm -rf backend_backup
+        run: mv -f backend_backup/* backend/ && rm -rf backend_backup
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -149,10 +151,10 @@ jobs:
         id: key
         run: |
           export BACKEND_URL="http://localhost:9000"
-          curl -f "${BACKEND_URL}/health"
+          curl -fs "${BACKEND_URL}/health"
 
           # Login and get access token
-          export ACCESS_TOKEN=$(curl -v -X POST "${BACKEND_URL}/auth/user/emailpass" \
+          export ACCESS_TOKEN=$(curl -s -X POST "${BACKEND_URL}/auth/user/emailpass" \
             -H 'Content-Type: application/json' \
             --data-raw '{
               "email": "admin@medusa-test.com",
@@ -160,7 +162,7 @@ jobs:
             }' | jq -r '.token')
 
           # Get the API key token
-          export PUBLISHABLE_KEY=$(curl -v "${BACKEND_URL}/admin/api-keys" \
+          export PUBLISHABLE_KEY=$(curl -s "${BACKEND_URL}/admin/api-keys" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" | jq -r '.api_keys[0].token')
           # Export the key to GitHub outputs
           echo "PUBLISHABLE_KEY=${PUBLISHABLE_KEY}" >> $GITHUB_OUTPUT
