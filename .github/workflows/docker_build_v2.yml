@@ -1,10 +1,10 @@
 name: Build Docker Images
-on: push
-  # push:
-  #   branches:
-  #     - v2
-  #   tags:
-  #     - "v2*"
+on:
+  push:
+    branches:
+      - v2
+    tags:
+      - "v2*"
 
 concurrency:
   group: ${{ github.ref }}/build-v2
