@@ -76,7 +76,7 @@ jobs:
           context: backend
           platforms: linux/amd64,linux/arm64
           build-args: |
-            NODE_ENV=development
+            NODE_ENV=CI
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
