@@ -114,12 +114,9 @@ Use the Docker setup provided in this repository to containerize your project. C
 Run the following commands:
 
 ```bash
-cd backend
-git init
-git remote add origin https://github.com/medusajs/medusa-starter-default.git
-git pull origin master
-cd ..
+git clone https://github.com/medusajs/medusa-starter-default.git
 ```
+Copy and replace files from `backend` folder to created directory.
 
 This sets up the Medusa backend starter template (Medusa v2).
 
@@ -128,12 +125,9 @@ This sets up the Medusa backend starter template (Medusa v2).
 Run the following commands:
 
 ```bash
-cd storefront
-git init
-git remote add origin https://github.com/medusajs/nextjs-starter-medusa.git
-git pull origin main
-cd ..
+git clone https://github.com/medusajs/nextjs-starter-medusa.git
 ```
+Copy and replace files from `storefront` folder to created directory.
 
 This sets up the Medusa storefront starter template (Medusa v2).
 
@@ -266,7 +260,7 @@ This ensures flexibility for production environments.
 
 For support or inquiries, visit:
 
-[Uninterrupted](https://uninterrupted.tech/)
+[Uninterrupted](https://u11d.com)
 
 ---
-:heart: _Technology made with passion by u11d_
+:heart: _Technology made with passion by [u11d](https://u11d.com)_
