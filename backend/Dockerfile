@@ -1,9 +1,9 @@
-ARG NODE_VERSION=23.7
+ARG NODE_VERSION=22.14
 FROM node:${NODE_VERSION}-bookworm-slim AS base
 
 FROM base AS deps
 WORKDIR /opt/medusa/deps
-ARG NODE_ENV=production
+ARG NODE_ENV=development
 ENV NODE_ENV=$NODE_ENV
 
 # Install dependencies

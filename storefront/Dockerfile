@@ -1,15 +1,15 @@
-ARG NODE_VERSION=23.7
+ARG NODE_VERSION=22.14
 FROM node:${NODE_VERSION}-bookworm-slim AS base
 
 FROM base AS deps
 WORKDIR /opt/storefront/deps
-ARG NODE_ENV=production
+ARG NODE_ENV=development
 ENV NODE_ENV=$NODE_ENV
 
 # Install dependencies
 COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
 RUN \
-  if [ -f yarn.lock ]; then corepack enable yarn && yarn install; \
+  if [ -f yarn.lock ]; then corepack enable yarn && yarn --immutable; \
   elif [ -f package-lock.json ]; then npm ci; \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install; \
   else echo "Lockfile not found." && exit 1; \
@@ -43,7 +43,13 @@ RUN apt-get update \
 
 USER node
 WORKDIR /opt/storefront
-COPY --from=builder --chown=node:node /opt/storefront/build/ .
+
+COPY --from=builder --chown=node:node /opt/storefront/build/public ./public
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=node:node /opt/storefront/build/.next/standalone ./
+COPY --from=builder --chown=node:node /opt/storefront/build/.next/static ./.next/static
 
 ARG NODE_ENV=production
 ARG PORT=8000
@@ -59,4 +65,4 @@ EXPOSE $PORT
 
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
