@@ -102,6 +102,7 @@ jobs:
         with:
           repository: medusajs/nextjs-starter-medusa
           ref: main
+          path: nextjs-starter-medusa
       - name: Move storefront files
         run: |
           shopt -s dotglob  # Enable dotfile globbing
@@ -114,6 +115,7 @@ jobs:
         with:
           repository: medusajs/medusa-starter-default
           ref: master
+          path: medusa-starter-default
       - name: Restore backend files
         run: |
           shopt -s dotglob  # Enable dotfile globbing
