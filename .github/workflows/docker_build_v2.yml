@@ -108,8 +108,6 @@ jobs:
           shopt -s dotglob  # Enable dotfile globbing
           mv -f storefront/* nextjs-starter-medusa/
           rm -rf storefront
-      - name: Save backend files
-        run: mv backend backend_backup
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -120,7 +118,7 @@ jobs:
         run: |
           shopt -s dotglob  # Enable dotfile globbing
           mv -f backend/* medusa-starter-default/
-          rm -rf backend_backup
+          rm -rf backend
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
