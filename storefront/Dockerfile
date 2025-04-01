@@ -28,6 +28,7 @@ ENV NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 # Build the application
 COPY --from=deps /opt/storefront/deps .
 COPY . .
+COPY --from=deps /opt/storefront/deps/*.lock ./
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
