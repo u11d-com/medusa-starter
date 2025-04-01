@@ -1,7 +1,7 @@
 services:
   frontend:
     build:
-      context: storefront
+      context: nextjs-starter-medusa
       args:
         - NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
     ports:

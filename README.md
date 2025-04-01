@@ -2,13 +2,17 @@
 
 # Project Starter Templates for Medusa Commerce Platform
 
+![v2 Build Status](https://img.shields.io/github/actions/workflow/status/u11d-com/medusa-starter/docker_build_v2.yml?branch=v2&label=Medusa%20v2%20build) ![v1 Build Status](https://img.shields.io/github/actions/workflow/status/u11d-com/medusa-starter/docker_build_v1.yml?branch=v1&label=Medusa%20v1%20build)
+
 ## Introduction
+
 This project provides developers with starter templates for both the backend and storefront using the **Medusa framework**. The primary objectives are to demonstrate:
 
 - How to configure a development environment using **Docker Compose**.
 - How to structure a **GitHub workflow pipeline** for building and deploying a Medusa project.
 
 ## About Medusa
+
 [Medusa](https://medusajs.com/) is a modular commerce framework designed for building advanced e-commerce applications without reinventing core commerce logic. Medusa’s flexible architecture allows developers to create:
 
 - Scalable e-commerce stores
@@ -17,12 +21,13 @@ This project provides developers with starter templates for both the backend and
 
 All modules are open-source and available on npm, providing full customization and extensibility.
 
-
 ## Project Structure Overview
+
 The `medusa-starter` repository is organized to provide a clear, modular structure for managing both the backend and storefront of a Medusa-based commerce platform. The setup leverages Docker Compose for service orchestration and includes essential configuration files for streamlined development, testing, and deployment.
 
 ### Directory Layout
-```bash
+
+```shell
 medusa-starter/
 ├── .github/                 # GitHub workflows and automation scripts
 ├── .vscode/                 # VS Code workspace settings
@@ -42,15 +47,18 @@ medusa-starter/
 ```
 
 ### Key Components
+
 - `.github/` - Contains GitHub Actions workflows to automate CI/CD processes, ensuring smooth integration and deployment pipelines.
 - `.vscode/` - Houses workspace settings to standardize development environments across teams using Visual Studio Code.
 - `backend/` - This directory includes the Medusa backend setup:
   - `.dockerignore`: Lists files and directories to ignore during Docker builds.
   - `Dockerfile`: Defines the build instructions for the backend container.
   - `start.sh`: A shell script to automate database migrations, create an admin user if necessary, and start the Medusa backend in cluster mode.
+  - `medusa-config.ts`: Example of configuration for Medusa.
 - `storefront/` - The Next.js storefront application:
   - `.dockerignore`: Specifies files to exclude from the Docker image build.
   - `Dockerfile`: Instructions for building the storefront Docker image.
+  - `next.config.js`: Example of configuration for Next.js deployment in standalone mode.
 - Docker Compose Files:
   - `compose.yaml`: The primary file orchestrating PostgreSQL, Redis, and the Medusa backend services.
   - `compose.storefront.yaml`: Manages the storefront container separately to ensure modular service management.
@@ -64,6 +72,7 @@ medusa-starter/
 ## Installation & Setup
 
 ### Prerequisites
+
 Ensure you have the following installed:
 
 - [Docker](https://docs.docker.com/get-started/get-docker/)
@@ -71,9 +80,10 @@ Ensure you have the following installed:
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ### Cloning the Repository
+
 Run the following command:
 
-```bash
+```shell
 git clone https://github.com/u11d-com/medusa-starter.git
 cd medusa-starter
 ```
@@ -83,9 +93,10 @@ cd medusa-starter
 You can use the `create-medusa-app` command to generate a starter Medusa project.
 
 ### 1. Start Databases
+
 Run the following command to start the database services:
 
-```bash
+```shell
 docker compose -f compose.db.yaml up -d
 ```
 
@@ -102,9 +113,11 @@ docker compose -f compose.db.yaml up -d
 Modify `compose.db.yaml` to change these values.
 
 ### 2. Create a Medusa Project
+
 Follow the [Medusa installation guide](https://docs.medusajs.com/learn/installation) to create your first project using `create-medusa-app`.
 
 ### 3. Add Containerization
+
 Use the Docker setup provided in this repository to containerize your project. Copy files from the `backend` and `storefront` directories to their respective locations in your project. Then, use these files to build Docker images for your application.
 
 ## Setup Using Git
@@ -113,13 +126,11 @@ Use the Docker setup provided in this repository to containerize your project. C
 
 Run the following commands:
 
-```bash
-cd backend
-git init
-git remote add origin https://github.com/medusajs/medusa-starter-default.git
-git pull origin master
-cd ..
+```shell
+git clone https://github.com/medusajs/medusa-starter-default.git
 ```
+
+Copy and replace files from `backend` folder to created directory.
 
 This sets up the Medusa backend starter template (Medusa v2).
 
@@ -127,13 +138,11 @@ This sets up the Medusa backend starter template (Medusa v2).
 
 Run the following commands:
 
-```bash
-cd storefront
-git init
-git remote add origin https://github.com/medusajs/nextjs-starter-medusa.git
-git pull origin main
-cd ..
+```shell
+git clone https://github.com/medusajs/nextjs-starter-medusa.git
 ```
+
+Copy and replace files from `storefront` folder to created directory.
 
 This sets up the Medusa storefront starter template (Medusa v2).
 
@@ -143,7 +152,7 @@ This sets up the Medusa storefront starter template (Medusa v2).
 
 ### 1. Start the Medusa Backend and Services
 
-```bash
+```shell
 docker compose up --build -d
 ```
 
@@ -151,11 +160,12 @@ docker compose up --build -d
 
 Run this command once (unless the database volume is deleted):
 
-```bash
+```shell
 docker compose -f compose.seed.yaml run --rm seed
 ```
 
 ### 3. Start the Storefront
+
 You need NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY value from Medusa backend admin panel.
 Log in to `localhost:9000/app` with credentials from `compose.yaml` file:
 
@@ -163,9 +173,10 @@ Log in to `localhost:9000/app` with credentials from `compose.yaml` file:
   MEDUSA_ADMIN_EMAIL: admin@medusa-test.com
   MEDUSA_ADMIN_PASSWORD: supersecret
   ```
+
 You can find publishable key value in dashboard settings. Change it's value in `compose.storefront.yaml` file and run command:
 
-```bash
+```shell
 docker compose -f compose.storefront.yaml up --build
 ```
 
@@ -175,13 +186,13 @@ To stop services, run:
 
 - Stop the storefront:
 
-  ```bash
+  ```shell
   docker compose -f compose.storefront.yaml down
   ```
 
 - Stop the backend and other services:
 
-  ```bash
+  ```shell
   docker compose down
   ```
 
@@ -217,7 +228,7 @@ The backend runs on **Node.js** and can be customized using **TypeScript**. Repl
 
 The storefront runs on **Next.js**. To create a new storefront, use:
 
-```bash
+```shell
 npx create-next-app@latest
 ```
 
@@ -266,7 +277,7 @@ This ensures flexibility for production environments.
 
 For support or inquiries, visit:
 
-[Uninterrupted](https://uninterrupted.tech/)
+[Uninterrupted](https://u11d.com)
 
 ---
-:heart: _Technology made with passion by u11d_
+:heart: *Technology made with passion by [u11d](https://u11d.com)*

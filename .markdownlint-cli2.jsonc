@@ -1,0 +1,16 @@
+{
+  "config": {
+    // MD013/line-length : Line length : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md013.md
+    "MD013": false,
+    // MD024/no-duplicate-heading : Multiple headings with the same content : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md024.md
+    "MD024": false,
+    //MD033/no-inline-html : Inline HTML : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md033.md
+    "MD033": false
+  },
+  "globs": [
+    "examples/**/*.md",
+    "examples/**/*.mdx",
+    "*.md",
+    "*.mdx"
+  ]
+}
