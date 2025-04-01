@@ -179,7 +179,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: storefront
+          context: nextjs-starter-medusa
           add-hosts: |
             host.docker.internal=host-gateway
           build-args: |
