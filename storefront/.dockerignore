@@ -7,6 +7,7 @@
 .medusa
 .yarn
 .next
+.git
 build
 node_modules
 README.md
