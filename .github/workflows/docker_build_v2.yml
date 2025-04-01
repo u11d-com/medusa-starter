@@ -1,10 +1,10 @@
 name: Build Docker Images
-on:
-  push:
-    branches:
-      - v2
-    tags:
-      - "v2*"
+on: push
+  # push:
+  #   branches:
+  #     - v2
+  #   tags:
+  #     - "v2*"
 
 concurrency:
   group: ${{ github.ref }}/build-v2
@@ -97,19 +97,16 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      - name: Save storefront files
-        run: mv storefront storefront_backup
       - name: Checkout
         uses: actions/checkout@v4
         with:
           repository: medusajs/nextjs-starter-medusa
           ref: main
-          path: storefront
-      - name: Restore storefront files
+      - name: Move storefront files
         run: |
           shopt -s dotglob  # Enable dotfile globbing
-          mv -f storefront_backup/* storefront/
-          rm -rf storefront_backup
+          mv -f storefront/* nextjs-starter-medusa/
+          rm -rf storefront
       - name: Save backend files
         run: mv backend backend_backup
       - name: Checkout
@@ -117,9 +114,11 @@ jobs:
         with:
           repository: medusajs/medusa-starter-default
           ref: master
-          path: backend
       - name: Restore backend files
-        run: mv -f backend_backup/* backend/ && rm -rf backend_backup
+        run: |
+          shopt -s dotglob  # Enable dotfile globbing
+          mv -f backend/* medusa-starter-default/
+          rm -rf backend_backup
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
