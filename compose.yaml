@@ -37,7 +37,8 @@ services:
       retries: 5
 
   backend-server:
-    build: medusa-starter-default
+    build:
+      context: ./backend
     ports:
       - 9000:9000
     networks:
