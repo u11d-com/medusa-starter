@@ -7,8 +7,6 @@ services:
       POSTGRES_DB: medusa-starter
     ports:
       - 5432:5432
-    networks:
-      - medusa-network
     deploy:
       resources:
         limits:
@@ -26,8 +24,6 @@ services:
     image: redis:7
     ports:
       - 6379:6379
-    networks:
-      - medusa-network
     volumes:
       - cache-backend-data:/data
     healthcheck:
@@ -40,8 +36,6 @@ services:
     build: medusa-starter-default
     ports:
       - 9000:9000
-    networks:
-      - medusa-network
     deploy:
       resources:
         limits:
@@ -73,9 +67,6 @@ services:
       timeout: 5s
       start_period: 10s
       retries: 5
-
-networks:
-  medusa-network:
 
 volumes:
   postgres-data:

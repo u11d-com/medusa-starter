@@ -3,11 +3,11 @@ services:
     build:
       context: nextjs-starter-medusa
       args:
-        - NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_test_123
+        - NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_a6d3ffd9fe782581341e5dbf3cc34203f01d71f169663cbd54cd59ab87f9cf17
     ports:
       - 8000:8000
-    networks:
-      - medusa-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     deploy:
       resources:
         limits:
@@ -20,9 +20,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
-networks:
-  medusa-network:
 
 volumes:
   storefront-data:
