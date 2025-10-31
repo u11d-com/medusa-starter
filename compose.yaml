@@ -125,12 +125,12 @@ services:
       MEDUSA_ADMIN_PASSWORD: supersecret
       MEILISEARCH_HOST: http://meilisearch:7700
       MEILISEARCH_API_KEY: ms
-      S3_FILE_URL: http://minio:9002/medusa-bucket
-      S3_ENDPOINT: http://minio:9002
-      S3_ACCESS_KEY_ID: minioadmin
-      S3_SECRET_ACCESS_KEY: minioadmin
-      S3_REGION: us-east-1
-      S3_BUCKET: medusa-bucket
+      MINIO_FILE_URL: http://minio:9002/medusa-bucket
+      MINIO_ENDPOINT: http://minio:9002
+      MINIO_ACCESS_KEY_ID: minioadmin
+      MINIO_SECRET_ACCESS_KEY: minioadmin
+      MINIO_REGION: us-east-1
+      MINIO_BUCKET: medusa-bucket
       ZIPKIN_URL: http://zipkin:9411
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health"]

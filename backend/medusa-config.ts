@@ -1,118 +1,224 @@
 import { loadEnv, defineConfig, Modules } from '@medusajs/framework/utils'
 import { MeilisearchPluginOptions } from '@rokmohar/medusa-plugin-meilisearch'
 
-
-
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
+
+const DATABASE_URL = process.env.DATABASE_URL
+const REDIS_URL = process.env.REDIS_URL
+const DEPLOYMENT_TYPE = process.env.DEPLOYMENT_TYPE || 'local'
+
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:9000'
+const STORE_CORS = process.env.STORE_CORS || BACKEND_URL
+const ADMIN_CORS = process.env.ADMIN_CORS || BACKEND_URL
+const AUTH_CORS = process.env.AUTH_CORS || BACKEND_URL
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecret'
+const COOKIE_SECRET = process.env.COOKIE_SECRET || 'supersecret'
+
+const IS_ADMIN_DISABLED = process.env.IS_ADMIN_DISABLED === 'true'
+
+const CACHE_REDIS_URL = process.env.CACHE_REDIS_URL
+const EVENTS_REDIS_URL = process.env.EVENTS_REDIS_URL
+const WE_REDIS_URL = process.env.WE_REDIS_URL
+const LOCKING_REDIS_URL = process.env.LOCKING_REDIS_URL
+
+const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT
+const MINIO_ACCESS_KEY_ID = process.env.MINIO_ACCESS_KEY_ID
+const MINIO_SECRET_ACCESS_KEY = process.env.MINIO_SECRET_ACCESS_KEY
+const MINIO_REGION = process.env.MINIO_REGION
+const MINIO_BUCKET = process.env.MINIO_BUCKET
+const MINIO_FILE_URL = process.env.MINIO_FILE_URL
+
+const S3_ENDPOINT = process.env.S3_ENDPOINT
+const S3_ACCESS_KEY_ID = process.env.S3_ACCESS_KEY_ID
+const S3_SECRET_ACCESS_KEY = process.env.S3_SECRET_ACCESS_KEY
+const S3_REGION = process.env.S3_REGION
+const S3_BUCKET = process.env.S3_BUCKET
+const S3_FILE_URL = process.env.S3_FILE_URL
+
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY
+const SENDGRID_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL
+
+const RESEND_API_KEY = process.env.RESEND_API_KEY
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL
+
+const STRIPE_API_KEY = process.env.STRIPE_API_KEY
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET
+
+const MEILISEARCH_HOST = process.env.MEILISEARCH_HOST
+const MEILISEARCH_API_KEY = process.env.MEILISEARCH_API_KEY
 
 module.exports = defineConfig({
   projectConfig: {
-    databaseUrl: process.env.DATABASE_URL,
-    databaseDriverOptions: {
-      ssl: false,
-      sslmode: "disable",
-    },
-    redisUrl: process.env.REDIS_URL,
+    databaseUrl: DATABASE_URL,
+    ...(DEPLOYMENT_TYPE === 'local' ? {
+      databaseDriverOptions: {
+        ssl: false,
+        sslmode: 'disable',
+      },
+    } : {}),
+    redisUrl: REDIS_URL,
     http: {
-      storeCors: process.env.STORE_CORS!,
-      adminCors: process.env.ADMIN_CORS!,
-      authCors: process.env.AUTH_CORS!,
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+      storeCors: STORE_CORS,
+      adminCors: ADMIN_CORS,
+      authCors: AUTH_CORS,
+      jwtSecret: JWT_SECRET,
+      cookieSecret: COOKIE_SECRET,
     }
   },
+  admin: {
+    backendUrl: BACKEND_URL,
+    disable: IS_ADMIN_DISABLED,
+  },
   modules: [
-    {
-      resolve: "@medusajs/medusa/caching",
+    ...(CACHE_REDIS_URL ? [{
+      key: Modules.CACHING,
+      resolve: '@medusajs/medusa/caching',
       options: {
         providers: [
           {
-            resolve: "@medusajs/caching-redis",
-            id: "caching-redis",
+            resolve: '@medusajs/caching-redis',
+            id: 'caching-redis',
             // Optional, makes this the default caching provider
             is_default: true,
             options: {
-              redisUrl: process.env.CACHE_REDIS_URL,
+              redisUrl: CACHE_REDIS_URL,
             },
           },
         ],
       },
-    },
-    {
-      resolve: "@medusajs/medusa/event-bus-redis",
+    }] : []),
+    ...(EVENTS_REDIS_URL ? [{
+      key: Modules.EVENT_BUS,
+      resolve: '@medusajs/medusa/event-bus-redis',
       options: {
-        redisUrl: process.env.EVENTS_REDIS_URL,
+        redisUrl: EVENTS_REDIS_URL,
       },
-    },
-    {
-      resolve: "@medusajs/medusa/workflow-engine-redis",
+    }] : []),
+    ...(WE_REDIS_URL ? [{
+      key: Modules.WORKFLOW_ENGINE,
+      resolve: '@medusajs/medusa/workflow-engine-redis',
       options: {
         redis: {
-          url: process.env.WE_REDIS_URL,
+          url: WE_REDIS_URL,
         },
       },
-    },
-    {
-      resolve: "@medusajs/medusa/locking",
+    }] : []),
+    ...(LOCKING_REDIS_URL ? [{
+      key: Modules.LOCKING,
+      resolve: '@medusajs/medusa/locking',
       options: {
         providers: [
           {
-            resolve: "@medusajs/medusa/locking-redis",
-            id: "locking-redis",
-            // set this if you want this provider to be used by default
-            // and you have other Locking Module Providers registered.
+            resolve: '@medusajs/medusa/locking-redis',
+            id: 'locking-redis',
             is_default: true,
             options: {
-              redisUrl: process.env.LOCKING_REDIS_URL,
+              redisUrl: LOCKING_REDIS_URL,
             },
           },
         ],
       },
-    },
+    }] : []),
     {
-      resolve: "@medusajs/medusa/file",
+      resolve: '@medusajs/medusa/file',
       options: {
         providers: [
-          {
-            resolve: "@medusajs/medusa/file-s3",
-            id: "s3",
+          ...(MINIO_ENDPOINT && MINIO_ACCESS_KEY_ID && MINIO_SECRET_ACCESS_KEY ? [{
+            resolve: '@medusajs/medusa/file-s3',
+            id: 'minio',
             options: {
-              file_url: process.env.S3_FILE_URL,
-              access_key_id: process.env.S3_ACCESS_KEY_ID,
-              secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
-              region: process.env.S3_REGION,
-              bucket: process.env.S3_BUCKET,
-              endpoint: process.env.S3_ENDPOINT,
+              file_url: MINIO_FILE_URL,
+              access_key_id: MINIO_ACCESS_KEY_ID,
+              secret_access_key: MINIO_SECRET_ACCESS_KEY,
+              region: MINIO_REGION,
+              bucket: MINIO_BUCKET,
+              endpoint: MINIO_ENDPOINT,
               additional_client_config: {
                 forcePathStyle: true,
               },
             },
-          },
+          }] : []),
+          ...(S3_ENDPOINT && S3_ACCESS_KEY_ID && S3_SECRET_ACCESS_KEY ? [{
+            resolve: '@medusajs/medusa/file-s3',
+            id: 's3',
+            options: {
+              file_url: S3_FILE_URL,
+              access_key_id: S3_ACCESS_KEY_ID,
+              secret_access_key: S3_SECRET_ACCESS_KEY,
+              region: S3_REGION,
+              bucket: S3_BUCKET,
+              endpoint: S3_ENDPOINT,
+              additional_client_config: {
+                forcePathStyle: true,
+              },
+            },
+          }] : []),
+          ...(!MINIO_ENDPOINT && !S3_ENDPOINT ? [{
+            resolve: '@medusajs/file-local',
+            id: 'local',
+            options: {
+              upload_dir: 'static',
+              backend_url: `${BACKEND_URL}/static`
+            }
+          }] : [])
         ],
       },
     },
+    ...((SENDGRID_API_KEY && SENDGRID_FROM_EMAIL) || (RESEND_API_KEY && RESEND_FROM_EMAIL) ? [{
+      key: Modules.NOTIFICATION,
+      resolve: '@medusajs/notification',
+      options: {
+        providers: [
+          ...(SENDGRID_API_KEY && SENDGRID_FROM_EMAIL ? [{
+            resolve: '@medusajs/notification-sendgrid',
+            id: 'sendgrid',
+            options: {
+              channels: ['email'],
+              api_key: SENDGRID_API_KEY,
+              from: SENDGRID_FROM_EMAIL,
+            }
+          }] : []),
+          ...(RESEND_API_KEY && RESEND_FROM_EMAIL ? [{
+            resolve: './src/modules/email-notifications',
+            id: 'resend',
+            options: {
+              channels: ['email'],
+              api_key: RESEND_API_KEY,
+              from: RESEND_FROM_EMAIL,
+            },
+          }] : []),
+        ]
+      }
+    }] : []),
+    ...(STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET ? [{
+      key: Modules.PAYMENT,
+      resolve: '@medusajs/payment',
+      options: {
+        providers: [
+          {
+            resolve: '@medusajs/payment-stripe',
+            id: 'stripe',
+            options: {
+              apiKey: STRIPE_API_KEY,
+              webhookSecret: STRIPE_WEBHOOK_SECRET,
+            },
+          },
+        ],
+      },
+    }] : [])
   ],
   plugins: [
-    {
+    ...(MEILISEARCH_HOST && MEILISEARCH_API_KEY ? [{
       resolve: '@rokmohar/medusa-plugin-meilisearch',
       options: {
         config: {
-          host: process.env.MEILISEARCH_HOST ?? '',
-          apiKey: process.env.MEILISEARCH_API_KEY ?? '',
+          host: MEILISEARCH_HOST,
+          apiKey: MEILISEARCH_API_KEY
         },
         settings: {
-          // The key is used as the index name in Meilisearch
           products: {
-            // Required: Index type
             type: 'products',
-            // Optional: Whether the index is enabled. When disabled:
-            // - Index won't be created or updated
-            // - Documents won't be added or removed
-            // - Index won't be included in searches
-            // - All operations will be silently skipped
             enabled: true,
-            // Optional: Specify which fields to include in the index
-            // If not specified, all fields will be included
             fields: ['id', 'title', 'description', 'handle', 'variant_sku', 'thumbnail'],
             indexSettings: {
               searchableAttributes: ['title', 'description', 'variant_sku'],
@@ -120,49 +226,9 @@ module.exports = defineConfig({
               filterableAttributes: ['id', 'handle'],
             },
             primaryKey: 'id',
-            // Create your own transformer
-            /*transformer: (product) => ({
-              id: product.id,
-              // other attributes...
-            }),*/
-          },
-          categories: {
-            // Required: Index type
-            type: 'categories',
-            // Optional: Whether the index is enabled
-            enabled: true,
-            // Optional: Specify which fields to include in the index
-            // If not specified, all fields will be included
-            fields: ['id', 'name', 'description', 'handle', 'is_active', 'parent_id'],
-            indexSettings: {
-              searchableAttributes: ['name', 'description'],
-              displayedAttributes: ['id', 'name', 'description', 'handle', 'is_active', 'parent_id'],
-              filterableAttributes: ['id', 'handle', 'is_active', 'parent_id'],
-            },
-            primaryKey: 'id',
-            // Create your own transformer
-            /*transformer: (category) => ({
-              id: category.id,
-              name: category.name,
-              // other attributes...
-            }),*/
-          },
-        },
-        i18n: {
-          // Choose one of the following strategies:
-
-          // 1. Separate index per language
-          // strategy: 'separate-index',
-          // languages: ['en', 'fr', 'de'],
-          // defaultLanguage: 'en',
-
-          // 2. Language-specific fields with suffix
-          strategy: 'field-suffix',
-          languages: ['en', 'fr', 'de'],
-          defaultLanguage: 'en',
-          translatableFields: ['title', 'description'],
-        },
-      } satisfies MeilisearchPluginOptions,
-    },
+          }
+        }
+      } satisfies MeilisearchPluginOptions
+    }] : [])
   ],
 })
