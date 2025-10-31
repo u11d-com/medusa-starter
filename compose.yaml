@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_USER: medusa-starter
       POSTGRES_PASSWORD: medusa-password
@@ -21,13 +21,70 @@ services:
       retries: 5
 
   redis:
-    image: redis:7
+    image: redis:8
     ports:
       - 6379:6379
     volumes:
       - cache-backend-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    ports:
+      - 7700:7700
+    volumes:
+      - meilisearch-data:/data.ms
+    environment:
+      - MEILI_MASTER_KEY=ms
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:7700']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - 9001:9001
+      - 9002:9002
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_DEFAULT_BUCKETS: medusa-bucket
+    command: server /data --console-address ":9001" --address ":9002"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9002/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-setup:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9002 minioadmin minioadmin;
+      mc mb myminio/medusa-bucket --ignore-existing;
+      mc anonymous set public myminio/medusa-bucket;
+      echo 'MinIO bucket setup complete';
+      "
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    ports:
+      - 9411:9411
+    environment:
+      - STORAGE_TYPE=mem
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9411/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -46,6 +103,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
     volumes:
       - backend-server-data:/data
     environment:
@@ -56,11 +117,21 @@ services:
       CACHE_REDIS_URL: redis://redis:6379
       EVENTS_REDIS_URL: redis://redis:6379
       WE_REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
-      POSTGRES_URL: postgres://medusa-starter:medusa-password@postgres/medusa-starter?ssl_mode=disable
+      LOCKING_REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://medusa-starter:medusa-password@postgres:5432/medusa-starter
+      POSTGRES_URL: postgres://medusa-starter:medusa-password@postgres:5432/medusa-starter
       MEDUSA_CREATE_ADMIN_USER: true
       MEDUSA_ADMIN_EMAIL: admin@medusa-test.com
       MEDUSA_ADMIN_PASSWORD: supersecret
+      MEILISEARCH_HOST: http://meilisearch:7700
+      MEILISEARCH_API_KEY: ms
+      S3_FILE_URL: http://minio:9002/medusa-bucket
+      S3_ENDPOINT: http://minio:9002
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin
+      S3_REGION: us-east-1
+      S3_BUCKET: medusa-bucket
+      ZIPKIN_URL: http://zipkin:9411
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 10s
@@ -72,3 +143,5 @@ volumes:
   postgres-data:
   backend-server-data:
   cache-backend-data:
+  meilisearch-data:
+  minio-data:
