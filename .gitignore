@@ -55,5 +55,6 @@ Temporary Items
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode
 
-
+# Ignore Medusa starter default environment variables
+.env*
 medusa-starter-default
