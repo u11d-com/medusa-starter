@@ -95,4 +95,4 @@ fi
 
 # Run Medusa backend application
 cd "${BUILD_FOLDER}" || exit 1
-exec npx medusa start
+exec npx medusa start --cluster
