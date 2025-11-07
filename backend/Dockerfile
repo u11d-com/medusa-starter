@@ -7,7 +7,8 @@ ARG NODE_ENV=development
 ENV NODE_ENV=$NODE_ENV
 
 # Install dependencies
-COPY package*.json yarn.lock* pnpm-lock.yaml* .yarn* ./
+COPY package*.json yarn.lock* pnpm-lock.yaml* yarn* yalc* ./ 
+COPY .yalc/ .yalc/
 RUN \
   if [ -f yarn.lock ]; then corepack enable yarn && yarn install --immutable; \
   elif [ -f package-lock.json ]; then npm ci; \
