@@ -7,11 +7,6 @@ services:
       POSTGRES_DB: medusa-starter
     ports:
       - 5432:5432
-    deploy:
-      resources:
-        limits:
-          cpus: 2
-          memory: 1024M
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -41,7 +36,7 @@ services:
     environment:
       - MEILI_MASTER_KEY=ms
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:7700']
+      test: ["CMD", "curl", "-f", "http://localhost:7700"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -93,11 +88,6 @@ services:
     build: medusa-starter-default
     ports:
       - 9000:9000
-    deploy:
-      resources:
-        limits:
-          cpus: 2
-          memory: 2048M
     depends_on:
       postgres:
         condition: service_healthy

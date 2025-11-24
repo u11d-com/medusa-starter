@@ -8,11 +8,6 @@ services:
       - 8000:8000
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    deploy:
-      resources:
-        limits:
-          cpus: 2
-          memory: 1024M
     volumes:
       - storefront-data:/data
     healthcheck:
