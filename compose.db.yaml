@@ -7,11 +7,6 @@ services:
       POSTGRES_DB: medusa-starter
     ports:
       - 5432:5432
-    deploy:
-      resources:
-        limits:
-          cpus: 2
-          memory: 1024M
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
