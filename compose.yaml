@@ -13,7 +13,7 @@ services:
           cpus: 2
           memory: 1024M
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "medusa-starter"]
       interval: 10s
@@ -41,7 +41,7 @@ services:
     environment:
       - MEILI_MASTER_KEY=ms
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:7700']
+      test: ["CMD", "curl", "-f", "http://localhost:7700"]
       interval: 10s
       timeout: 5s
       retries: 5
