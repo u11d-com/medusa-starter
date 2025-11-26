@@ -148,6 +148,16 @@ This sets up the Medusa storefront starter template (Medusa v2).
 
 ## Running the Development Environment
 
+### Optional: Enable Meilisearch Search
+
+To integrate Meilisearch, add the `medusa-plugin-meilisearch` package to your project:
+
+```shell
+npm install @rokmohar/medusa-plugin-meilisearch
+# or
+yarn add @rokmohar/medusa-plugin-meilisearch
+```
+
 ### 1. Start the Medusa Backend and Services
 
 ```shell
@@ -167,10 +177,10 @@ docker compose -f compose.seed.yaml run --rm seed
 You need NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY value from Medusa backend admin panel.
 Log in to `localhost:9000/app` with credentials from `compose.yaml` file:
 
-  ```plaintext
-  MEDUSA_ADMIN_EMAIL: admin@medusa-test.com
-  MEDUSA_ADMIN_PASSWORD: supersecret
-  ```
+```plaintext
+MEDUSA_ADMIN_EMAIL: admin@medusa-test.com
+MEDUSA_ADMIN_PASSWORD: supersecret
+```
 
 You can find publishable key value in dashboard settings. Change it's value in `compose.storefront.yaml` file and run command:
 
@@ -278,4 +288,5 @@ For support or inquiries, visit:
 [Uninterrupted](https://u11d.com)
 
 ---
-:heart: *Technology made with passion by [u11d](https://u11d.com)*
+
+:heart: _Technology made with passion by [u11d](https://u11d.com)_
